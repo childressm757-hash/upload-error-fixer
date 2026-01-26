@@ -1,20 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Upload Error Fixer</title>
-</head>
-<body>
+@app.route("/", methods=["GET", "POST"])
+def index():
+    message = None
+    download_file = None
 
-<h1>Upload Error Fixer</h1>
+    if request.method == "POST":
+        file = request.files.get("file")
 
-{% if message %}
-<p style="color: green;"><strong>{{ message }}</strong></p>
-{% endif %}
+        if not file or not file.filename.lower().endswith(".pdf"):
+            message = "Please upload a valid PDF file."
+            return render_template("index.html", message=message)
 
-<form method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" accept=".pdf" required>
-    <button type="submit">Fix File</button>
-</form>
+        input_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(input_path)
 
-</body>
-</html>
+        reader = PdfReader(input_path)
+        writer = PdfWriter()
+
+        for page in reader.pages:
+            writer.add_page(page)
+
+        fixed_name = "fixed_" + file.filename
+        output_path = os.path.join(FIXED_FOLDER, fixed_name)
+
+        with open(output_path, "wb") as f:
+            writer.write(f)
+
+        message = "✅ File rebuilt successfully. Use the link below to download."
+        download_file = fixed_name
+
+    return render_template(
+        "index.html",
+        message=message,
+        download_file=download_file
+    )
