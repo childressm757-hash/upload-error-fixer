@@ -5,9 +5,16 @@
 </head>
 <body>
   <h1>Upload Error Fixer</h1>
+
   <form method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" required>
+    <label>Paste the error message:</label><br>
+    <textarea name="error_message" rows="6" cols="60"></textarea><br><br>
+
+    <label>Upload file:</label><br>
+    <input type="file" name="file"><br><br>
+
     <button type="submit">Fix File</button>
   </form>
+
 </body>
 </html>
