@@ -13,10 +13,14 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    if request.method == "POST":
-        file = request.files.get("file")
-        if not file or file.filename == "":
-            return "No file uploaded", 400
+   if request.method == "POST":
+    uploaded_file = request.files.get("file")
+
+    if not uploaded_file or uploaded_file.filename == "":
+        return "No file uploaded", 400
+
+    return f"Received file: {uploaded_file.filename}"
+
 
         filename = secure_filename(file.filename)
         uid = uuid.uuid4().hex
