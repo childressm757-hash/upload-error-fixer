@@ -1,42 +1,48 @@
-from flask import Flask, request, send_file, render_template
+from flask import Flask, render_template, request, send_file
 import os
+from PyPDF2 import PdfReader, PdfWriter
 import uuid
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
 UPLOAD_FOLDER = "uploads"
-OUTPUT_FOLDER = "outputs"
+FIXED_FOLDER = "fixed"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+os.makedirs(FIXED_FOLDER, exist_ok=True)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-   if request.method == "POST":
-    uploaded_file = request.files.get("file")
+    message = None
 
-    if not uploaded_file or uploaded_file.filename == "":
-        return "No file uploaded", 400
+    if request.method == "POST":
+        file = request.files.get("file")
 
-    return f"Received file: {uploaded_file.filename}"
+        if not file or not file.filename.lower().endswith(".pdf"):
+            message = "Please upload a valid PDF file."
+            return render_template("index.html", message=message)
 
-
-        filename = secure_filename(file.filename)
-        uid = uuid.uuid4().hex
-        input_path = os.path.join(UPLOAD_FOLDER, f"{uid}_{filename}")
-        output_path = os.path.join(OUTPUT_FOLDER, f"fixed_{filename}")
-
+        # Save uploaded file
+        input_path = os.path.join(UPLOAD_FOLDER, f"{uuid.uuid4()}.pdf")
         file.save(input_path)
 
-        # Re-save file to strip bad metadata / encoding issues
-        with open(input_path, "rb") as f_in:
-            with open(output_path, "wb") as f_out:
-                f_out.write(f_in.read())
+        # Rebuild PDF
+        reader = PdfReader(input_path)
+        writer = PdfWriter()
+
+        for page in reader.pages:
+            writer.add_page(page)
+
+        output_path = os.path.join(FIXED_FOLDER, "fixed_" + file.filename)
+
+        with open(output_path, "wb") as f:
+            writer.write(f)
+
+        message = "✅ File rebuilt successfully. If your upload failed before, try this version."
 
         return send_file(output_path, as_attachment=True)
 
-    return render_template("index.html")
+    return render_template("index.html", message=message)
 
 if __name__ == "__main__":
     app.run(debug=True)
