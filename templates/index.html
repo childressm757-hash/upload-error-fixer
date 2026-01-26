@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Upload Error Fixer</title>
+    <title>Upload Error Fixer</title>
 </head>
 <body>
-  <h1>Upload Error Fixer</h1>
 
-  <form method="POST" enctype="multipart/form-data">
-    <label>Paste the error message:</label><br>
-    <textarea name="error_message" rows="6" cols="60"></textarea><br><br>
+<h1>Upload Error Fixer</h1>
 
-    <label>Upload file:</label><br>
-    <input type="file" name="file"><br><br>
+{% if message %}
+<p style="color: green;"><strong>{{ message }}</strong></p>
+{% endif %}
 
+<form method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".pdf" required>
     <button type="submit">Fix File</button>
-  </form>
+</form>
 
 </body>
 </html>
