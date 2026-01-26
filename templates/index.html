@@ -37,5 +37,12 @@ def download(filename):
     return send_file(
         os.path.join(FIXED_FOLDER, filename),
         as_attachment=True
-    )
+    ){% if download_file %}
+<p>
+  <a href="{{ url_for('download', filename=download_file) }}">
+    ⬇️ Download Fixed File
+  </a>
+</p>
+{% endif %}
+
 
