@@ -32,4 +32,10 @@ def index():
         "index.html",
         message=message,
         download_file=download_file
+    )@app.route("/download/<filename>")
+def download(filename):
+    return send_file(
+        os.path.join(FIXED_FOLDER, filename),
+        as_attachment=True
     )
+
