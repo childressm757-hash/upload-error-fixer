@@ -1,48 +1,31 @@
-@app.route("/", methods=["GET", "POST"])
-def index():
-    message = None
-    download_file = None
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Error Fixer</title>
+</head>
+<body>
 
-    if request.method == "POST":
-        file = request.files.get("file")
+    <h1>Upload Error Fixer</h1>
 
-        if not file or not file.filename.lower().endswith(".pdf"):
-            message = "Please upload a valid PDF file."
-            return render_template("index.html", message=message)
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pdf" required>
+        <button type="submit">Fix File</button>
+    </form>
 
-        input_path = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(input_path)
+    {% if message %}
+        <p style="margin-top:15px; font-weight:bold; color:green;">
+            {{ message }}
+        </p>
+    {% endif %}
 
-        reader = PdfReader(input_path)
-        writer = PdfWriter()
+    {% if download_file %}
+        <p>
+            <a href="{{ url_for('download', filename=download_file) }}">
+                ⬇ Download Fixed File
+            </a>
+        </p>
+    {% endif %}
 
-        for page in reader.pages:
-            writer.add_page(page)
-
-        fixed_name = "fixed_" + file.filename
-        output_path = os.path.join(FIXED_FOLDER, fixed_name)
-
-        with open(output_path, "wb") as f:
-            writer.write(f)
-
-        message = "✅ File rebuilt successfully. Use the link below to download."
-        download_file = fixed_name
-
-    return render_template(
-        "index.html",
-        message=message,
-        download_file=download_file
-    )@app.route("/download/<filename>")
-def download(filename):
-    return send_file(
-        os.path.join(FIXED_FOLDER, filename),
-        as_attachment=True
-    ){% if download_file %}
-<p>
-  <a href="{{ url_for('download', filename=download_file) }}">
-    ⬇️ Download Fixed File
-  </a>
-</p>
-{% endif %}
-
-
+</body>
+</html>
