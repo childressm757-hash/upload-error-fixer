@@ -3,29 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Upload Error Fixer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #4CAF50;
+            background-color: #e8f5e9;
+        }
+        .error {
+            border-color: #f44336;
+            background-color: #fdecea;
+        }
+        a {
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 
-    <h1>Upload Error Fixer</h1>
+<h1>Upload Error Fixer</h1>
 
-    <form method="post" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".pdf" required>
-        <button type="submit">Fix File</button>
-    </form>
+<form method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="submit">Fix File</button>
+</form>
 
-    {% if message %}
-        <p style="margin-top:15px; font-weight:bold; color:green;">
-            {{ message }}
-        </p>
-    {% endif %}
-
-    {% if download_file %}
-        <p>
+{% if message %}
+    <div class="message">
+        {{ message }}
+        {% if download_file %}
+            <br>
             <a href="{{ url_for('download', filename=download_file) }}">
                 ⬇ Download Fixed File
             </a>
-        </p>
-    {% endif %}
+        {% endif %}
+    </div>
+{% endif %}
 
 </body>
 </html>
