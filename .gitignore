@@ -1,0 +1,6 @@
+uploads/
+outputs/
+fixed/
+__pycache__/
+venv/
+.env
